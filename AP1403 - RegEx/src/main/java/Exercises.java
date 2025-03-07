@@ -9,7 +9,13 @@ public class Exercises {
         complete the method below, so it will validate an email address
      */
     public boolean validateEmail(String email) {
-        String regex = ""; // todo
+        String regex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        // [a-zA-Z0-9_+&*-]+ Local part
+        // ?:\.[a-zA-Z0-9_+&*-]+)* Optional Part
+        // @ seprate local from Optional
+        // (?:[a-zA-Z0-9-]+\.)+ Domain Part
+        // [a-zA-Z]{2,7} Top Level Domain
+        // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s01.html
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
 
@@ -22,7 +28,30 @@ public class Exercises {
         if there's no match for a date, return null
      */
     public String findDate(String string) {
-        // todo
+        // British > (DD/MM/YYYY)
+        String britishRegex = "\\b(0?[1-9]|[12][0-9]|3[01])[/-](0?[1-9]|1[0-2])[/-](\\d{4})\\b";
+        // American > (MM/DD/YYYY)
+        String americanRegex = "\\b(0?[1-9]|1[0-2])[/-](0?[1-9]|[12][0-9]|3[01])[/-](\\d{4})\\b";
+        // ISO format :/ > (YYYY-MM-DD or YYYY/MM/DD) (u said british or american format!)
+        String isoRegex = "\\b(\\d{4})[/-](0?[1-9]|1[0-2])[/-](0?[1-9]|[12][0-9]|3[01])\\b";
+
+        Pattern pattern = Pattern.compile(britishRegex);
+        Matcher matcher = pattern.matcher(string);
+
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        pattern = Pattern.compile(americanRegex);
+        matcher = pattern.matcher(string);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        pattern = Pattern.compile(isoRegex);
+        matcher = pattern.matcher(string);
+
+        if (matcher.find()) {
+            return matcher.group();
+        }
         return null;
     }
 
@@ -37,8 +66,26 @@ public class Exercises {
         - has no white-space in it
      */
     public int findValidPasswords(String string) {
-        // todo
-        return -1;
+        String[] allPass = string.split("\\s+"); //split
+        int counti = 0;
+        String pasPattern =
+                "^(?=.*[a-z])" +          // at least a lowercase
+                        "(?=.*[A-Z])" +          // at least one uppercase lette
+                        "(?=.*\\d)" +            // at least one number
+                        "(?=.*[!@#$%^&*])" +     // at least a special char "!@#$%^&*"
+                        "[^\\s]{8,}$";           // at least 8 characters + has no white-space in it
+
+
+
+        Pattern pattern = Pattern.compile(pasPattern);
+
+        for (String password : allPass) {
+            if (pattern.matcher(password).find()) {
+                counti++;
+            }
+        }
+
+        return counti;
     }
 
     /*
@@ -49,11 +96,38 @@ public class Exercises {
      */
     public List<String> findPalindromes(String string) {
         List<String> list = new ArrayList<>();
-        // todo
+
+        // at least 3 letters + no whitespace
+        String wordRegex = "\\b\\w{3,}\\b";
+        Pattern pattern = Pattern.compile(wordRegex);
+        Matcher matcher = pattern.matcher(string);
+        while (matcher.find()) {
+            String word = matcher.group();
+
+            // Check for palindrome
+            if (testPalindrome(word.toLowerCase())) {
+                list.add(word);
+            }
+        }
+
         return list;
     }
 
+    private boolean testPalindrome(String word) {
+        int leftPoint = 0;
+        int rightPoint = word.length() - 1;
+        while (leftPoint < rightPoint) {
+            if (word.charAt(leftPoint) != word.charAt(rightPoint)) {
+                return false;
+            }
+            leftPoint++;
+            rightPoint--;
+        }
+
+        return true;
+    }
+
     public static void main(String[] args) {
-        // you can test your code here
+        new Exercises().findValidPasswords("NoSpecial1 WeakPass! NoDigits@");
     }
 }
